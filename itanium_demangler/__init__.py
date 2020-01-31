@@ -479,7 +479,8 @@ def _parse_name(cursor, is_nested=False):
             node.kind == 'name' or
             match.group('std_prefix') is not None or
             match.group('std_name') is not None or
-            match.group('substitution') is not None):
+            match.group('substitution') is not None or
+            match.group('operator_name') is not None):
         if node.kind == 'name' or match.group('std_prefix') is not None:
             cursor.add_subst(node) # <unscoped-template-name> ::= <substitution>
         templ_args = _parse_until_end(cursor, 'tpl_args', _parse_type)

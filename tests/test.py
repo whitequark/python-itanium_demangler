@@ -128,3 +128,9 @@ class TestDemangler(unittest.TestCase):
 
     def test_const(self):
         self.assertDemangles('_ZL3foo', 'foo')
+
+    def test_operator_template(self):
+        self.assertDemangles('_ZmiIiE', 'operator-<int>')
+        self.assertDemangles('_ZmiIiEvv', 'void operator-<int>()')
+        self.assertDemangles('_ZmiIiEvKT_RT_', 'void operator-<int>(int const, int&)')
+

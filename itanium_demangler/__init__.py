@@ -326,9 +326,15 @@ _builtin_types = {
     'e':  '__float80',
     'g':  '__float128',
     'z':  '...',
+    'Dd': '_Decimal64',
+    'De': '_Decimal128',
+    'Df': '_Decimal32',
+    'Dh': '_Float16',
     'Di': 'char32_t',
     'Ds': 'char16_t',
     'Da': 'auto',
+    'Dc': 'decltype(auto)',
+    'Dn': [Node('name', 'std'), Node('builtin', 'nullptr_t')]
 }
 
 
@@ -513,7 +519,11 @@ def _parse_type(cursor):
         node = _parse_name(cursor)
         cursor.add_subst(node)
     elif match.group('builtin_type') is not None:
-        node = Node('builtin', _builtin_types[match.group('builtin_type')])
+        value = _builtin_types[match.group('builtin_type')]
+        if isinstance(value, list):
+            node = Node('qual_name', value)
+        else:
+            node = Node('builtin', value)
     elif match.group('qualified_type') is not None:
         ty = _parse_type(cursor)
         if ty is None:

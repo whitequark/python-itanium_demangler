@@ -333,7 +333,6 @@ _builtin_types = {
     'Di': 'char32_t',
     'Ds': 'char16_t',
     'Da': 'auto',
-    'Dc': 'decltype(auto)',
     'Dn': [Node('name', 'std'), Node('builtin', 'nullptr_t')]
 }
 

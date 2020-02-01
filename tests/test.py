@@ -122,6 +122,10 @@ class TestDemangler(unittest.TestCase):
         self.assertDemangles('_ZN2n11fEPNS_1bEPNS_2n21cEPNS2_2n31dE',
                              'n1::f(n1::b*, n1::n2::c*, n1::n2::n3::d*)')
         self.assertDemangles('_ZN1f1gES_IFvvEE', 'f::g(f<void ()>)')
+        self.assertDemangles('_ZplIcET_S0_', 'char operator+<char>(char)')
+        self.assertParses('_ZplIcET_S1_', None)
+        # Operator template results don't get added to substitutions
+        self.assertParses('_ZStplIcEvS0_', None)
 
     def test_abi_tag(self):
         self.assertDemangles('_Z3fooB5cxx11v', 'foo[abi:cxx11]()')

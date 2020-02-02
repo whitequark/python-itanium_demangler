@@ -62,7 +62,7 @@ class TestDemangler(unittest.TestCase):
 
     def test_builtin_types(self):
         for ty in _builtin_types:
-            self.assertDemangles('_Z1fI' + ty + 'E', 'f<' + _builtin_types[ty] + '>')
+            self.assertDemangles('_Z1fI' + ty + 'E', 'f<' + str(_builtin_types[ty]) + '>')
 
     def test_qualified_type(self):
         self.assertDemangles('_Z1fIriE', 'f<int restrict>')

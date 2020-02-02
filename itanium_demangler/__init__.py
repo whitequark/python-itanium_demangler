@@ -305,35 +305,35 @@ _operators = {
 }
 
 _builtin_types = {
-    'v':  'void',
-    'w':  'wchar_t',
-    'b':  'bool',
-    'c':  'char',
-    'a':  'signed char',
-    'h':  'unsigned char',
-    's':  'short',
-    't':  'unsigned short',
-    'i':  'int',
-    'j':  'unsigned int',
-    'l':  'long',
-    'm':  'unsigned long',
-    'x':  'long long',
-    'y':  'unsigned long long',
-    'n':  '__int128',
-    'o':  'unsigned __int128',
-    'f':  'float',
-    'd':  'double',
-    'e':  '__float80',
-    'g':  '__float128',
-    'z':  '...',
-    'Dd': '_Decimal64',
-    'De': '_Decimal128',
-    'Df': '_Decimal32',
-    'Dh': '_Float16',
-    'Di': 'char32_t',
-    'Ds': 'char16_t',
-    'Da': 'auto',
-    'Dn': [Node('name', 'std'), Node('builtin', 'nullptr_t')]
+    'v':  Node('builtin', 'void'),
+    'w':  Node('builtin', 'wchar_t'),
+    'b':  Node('builtin', 'bool'),
+    'c':  Node('builtin', 'char'),
+    'a':  Node('builtin', 'signed char'),
+    'h':  Node('builtin', 'unsigned char'),
+    's':  Node('builtin', 'short'),
+    't':  Node('builtin', 'unsigned short'),
+    'i':  Node('builtin', 'int'),
+    'j':  Node('builtin', 'unsigned int'),
+    'l':  Node('builtin', 'long'),
+    'm':  Node('builtin', 'unsigned long'),
+    'x':  Node('builtin', 'long long'),
+    'y':  Node('builtin', 'unsigned long long'),
+    'n':  Node('builtin', '__int128'),
+    'o':  Node('builtin', 'unsigned __int128'),
+    'f':  Node('builtin', 'float'),
+    'd':  Node('builtin', 'double'),
+    'e':  Node('builtin', '__float80'),
+    'g':  Node('builtin', '__float128'),
+    'z':  Node('builtin', '...'),
+    'Dd': Node('builtin', '_Decimal64'),
+    'De': Node('builtin', '_Decimal128'),
+    'Df': Node('builtin', '_Decimal32'),
+    'Dh': Node('builtin', '_Float16'),
+    'Di': Node('builtin', 'char32_t'),
+    'Ds': Node('builtin', 'char16_t'),
+    'Da': Node('builtin', 'auto'),
+    'Dn': Node('qual_name', (Node('name', 'std'), Node('builtin', 'nullptr_t')))
 }
 
 
@@ -518,11 +518,7 @@ def _parse_type(cursor):
         node = _parse_name(cursor)
         cursor.add_subst(node)
     elif match.group('builtin_type') is not None:
-        value = _builtin_types[match.group('builtin_type')]
-        if isinstance(value, list):
-            node = Node('qual_name', value)
-        else:
-            node = Node('builtin', value)
+        node = _builtin_types[match.group('builtin_type')]
     elif match.group('qualified_type') is not None:
         ty = _parse_type(cursor)
         if ty is None:

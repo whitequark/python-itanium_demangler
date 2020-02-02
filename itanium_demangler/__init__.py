@@ -333,7 +333,7 @@ _builtin_types = {
     'Di': Node('builtin', 'char32_t'),
     'Ds': Node('builtin', 'char16_t'),
     'Da': Node('builtin', 'auto'),
-    'Dn': Node('qual_name', [Node('name', 'std'), Node('builtin', 'nullptr_t')])
+    'Dn': Node('qual_name', (Node('name', 'std'), Node('builtin', 'nullptr_t')))
 }
 
 

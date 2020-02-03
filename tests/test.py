@@ -102,6 +102,8 @@ class TestDemangler(unittest.TestCase):
         self.assertDemangles('_ZTS1f', 'typeinfo name for f')
         self.assertDemangles('_ZThn16_1fv', 'non-virtual thunk for f()')
         self.assertDemangles('_ZTv16_8_1fv', 'virtual thunk for f()')
+        self.assertDemangles('_ZGV1f', 'guard variable for f')
+        self.assertDemangles('_ZGTt1fv', 'transaction clone for f()')
 
     def test_template_param(self):
         self.assertDemangles('_ZN1fIciEEvT_PT0_', 'void f<char, int>(char, int*)')

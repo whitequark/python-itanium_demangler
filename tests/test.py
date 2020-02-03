@@ -140,3 +140,7 @@ class TestDemangler(unittest.TestCase):
         self.assertDemangles('_ZmiIiEvv', 'void operator-<int>()')
         self.assertDemangles('_ZmiIiEvKT_RT_', 'void operator-<int>(int const, int&)')
 
+    def test_array(self):
+        self.assertDemangles('_Z1fA1_c', 'f(char[(int)1])')
+        self.assertParses('_Z1fA1c', None)
+

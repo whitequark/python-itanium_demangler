@@ -239,6 +239,27 @@ class FuncNode(namedtuple('FuncNode', 'kind name arg_tys ret_ty')):
             return self
 
 
+class ArrayNode(namedtuple('ArrayNode', 'kind dimension ty')):
+    def __repr__(self):
+        return "<ArrayNode {} {} {}>".format(self.kind, repr(self.dimension), repr(self.ty))
+
+    def __str__(self):
+        if self.kind == 'array':
+            result = ""
+            result += str(self.ty)
+            result += "[" + str(self.dimension) + "]"
+            return result
+        else:
+            return repr(self)
+
+    def map(self, f):
+        if self.kind == 'array':
+            return self._replace(dimension=f(self.dimension) if self.dimension else None,
+                                 ty=f(self.ty) if self.ty else None)
+        else:
+            return self
+
+
 _ctor_dtor_map = {
     'C1': 'complete',
     'C2': 'base',
@@ -362,6 +383,14 @@ def _handle_indirect(qualifier, node):
         return Node('rvalue', node)
     return node
 
+
+_NUMBER_RE = re.compile(r"\d+")
+
+def _parse_number(cursor):
+    match = cursor.match(_NUMBER_RE)
+    if match is None:
+        return None
+    return int(match.group(0))
 
 def _parse_seq_id(cursor):
     seq_id = cursor.advance_until('_')
@@ -513,7 +542,8 @@ _TYPE_RE = re.compile(r"""
 (?P<expr_primary>       (?= L)) |
 (?P<template_arg_pack>  J) |
 (?P<arg_pack_expansion> Dp) |
-(?P<decltype>           D[tT])
+(?P<decltype>           D[tT]) |
+(?P<array_type>         A)
 """, re.X)
 
 def _parse_type(cursor):
@@ -558,6 +588,16 @@ def _parse_type(cursor):
         node = Node('expand_arg_pack', node)
     elif match.group('decltype') is not None:
         raise NotImplementedError("decltype is not supported")
+    elif match.group('array_type') is not None:
+        dimension = _parse_number(cursor)
+        if dimension is None:
+            return None
+        else:
+            dimension = CastNode('literal', dimension, Node('builtin', 'int'))
+        if not cursor.accept('_'):
+            return None
+        type = _parse_type(cursor)
+        node = ArrayNode('array', dimension, type)
     else:
         return None
     return node

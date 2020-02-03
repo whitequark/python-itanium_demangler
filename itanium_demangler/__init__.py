@@ -157,6 +157,10 @@ class Node(namedtuple('Node', 'kind value')):
             return 'non-virtual thunk for ' + str(self.value)
         elif self.kind == 'virt_thunk':
             return 'virtual thunk for ' + str(self.value)
+        elif self.kind == 'guard_variable':
+            return 'guard variable for ' + str(self.value)
+        elif self.kind == 'transaction_clone':
+            return 'transaction clone for ' + str(self.value)
         else:
             return repr(self)
 
@@ -625,7 +629,10 @@ _SPECIAL_RE = re.compile(r"""
 (?P<rtti>               T (?P<kind> [VTIS])) |
 (?P<nonvirtual_thunk>   Th (?P<nv_offset> n? \d+) _) |
 (?P<virtual_thunk>      Tv (?P<v_offset> n? \d+) _ (?P<vcall_offset> n? \d+) _) |
-(?P<covariant_thunk>    Tc)
+(?P<covariant_thunk>    Tc) |
+(?P<guard_variable>     GV) |
+(?P<extended_temporary> GR) |
+(?P<transaction_clone>  GTt)
 """, re.X)
 
 def _parse_special(cursor):
@@ -656,6 +663,18 @@ def _parse_special(cursor):
         return Node('virt_thunk', func)
     elif match.group('covariant_thunk') is not None:
         raise NotImplementedError("covariant thunks are not supported")
+    elif match.group('guard_variable'):
+        name = _parse_type(cursor)
+        if name is None:
+            return None
+        return Node('guard_variable', name)
+    elif match.group('extended_temporary'):
+        raise NotImplementedError("extended temporaries are not supported")
+    elif match.group('transaction_clone'):
+        func = _parse_encoding(cursor)
+        if func is None:
+            return None
+        return Node('transaction_clone', func)
 
 
 _MANGLED_NAME_RE = re.compile(r"""

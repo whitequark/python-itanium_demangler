@@ -80,6 +80,7 @@ class TestDemangler(unittest.TestCase):
 
     def test_indirect_type(self):
         self.assertDemangles('_Z1fIPiE', 'f<int*>')
+        self.assertDemangles('_Z1fIPPiE', 'f<int**>')
         self.assertDemangles('_Z1fIRiE', 'f<int&>')
         self.assertDemangles('_Z1fIOiE', 'f<int&&>')
         self.assertDemangles('_Z1fIKRiE', 'f<int& const>')
@@ -142,5 +143,11 @@ class TestDemangler(unittest.TestCase):
 
     def test_array(self):
         self.assertDemangles('_Z1fA1_c', 'f(char[(int)1])')
+        self.assertDemangles('_Z1fRA1_c', 'f(char(&)[(int)1])')
         self.assertParses('_Z1fA1c', None)
 
+    def test_function(self):
+        self.assertDemangles('_Z1fFvvE', 'f(void ())')
+        self.assertDemangles('_Z1fPFvvE', 'f(void (*)())')
+        self.assertDemangles('_Z1fPPFvvE', 'f(void (**)())')
+        self.assertDemangles('_Z1fRPFvvE', 'f(void (*&)())')

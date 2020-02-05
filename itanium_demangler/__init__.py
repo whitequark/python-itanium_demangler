@@ -136,11 +136,11 @@ class Node(namedtuple('Node', 'kind value')):
         elif self.kind == 'oper_cast':
             return 'operator ' + str(self.value)
         elif self.kind == 'pointer':
-            return str(self.value) + '*'
+            return self.value.left() + '*' + self.value.right()
         elif self.kind == 'lvalue':
-            return str(self.value) + '&'
+            return self.value.left() + '&' + self.value.right()
         elif self.kind == 'rvalue':
-            return str(self.value) + '&&'
+            return self.value.left() + '&&' + self.value.right()
         elif self.kind == 'tpl_param':
             return '{T' + str(self.value) + '}'
         elif self.kind == 'subst':
@@ -164,6 +164,22 @@ class Node(namedtuple('Node', 'kind value')):
         else:
             return repr(self)
 
+    def left(self):
+        if self.kind == "pointer":
+            return self.value.left() + "*"
+        elif self.kind == "lvalue":
+            return self.value.left() + "&"
+        elif self.kind == "rvalue":
+            return self.value.left() + "&&"
+        else:
+            return str(self)
+
+    def right(self):
+        if self.kind in ("pointer", "lvalue", "rvalue"):
+            return self.value.right()
+        else:
+            return ""
+
     def map(self, f):
         if self.kind in ('oper_cast', 'pointer', 'lvalue', 'rvalue', 'expand_arg_pack',
                          'vtable', 'vtt', 'typeinfo', 'typeinfo_name'):
@@ -186,6 +202,12 @@ class QualNode(namedtuple('QualNode', 'kind value qual')):
         else:
             return repr(self)
 
+    def left(self):
+        return str(self)
+
+    def right(self):
+        return ""
+
     def map(self, f):
         if self.kind == 'cv_qual':
             return self._replace(value=f(self.value))
@@ -202,6 +224,12 @@ class CastNode(namedtuple('CastNode', 'kind value ty')):
             return '(' + str(self.ty) + ')' + str(self.value)
         else:
             return repr(self)
+
+    def left(self):
+        return str(self)
+
+    def right(self):
+        return ""
 
     def map(self, f):
         if self.kind == 'literal':
@@ -230,6 +258,29 @@ class FuncNode(namedtuple('FuncNode', 'kind name arg_tys ret_ty')):
         else:
             return repr(self)
 
+    def left(self):
+        if self.kind == 'func':
+            result = ""
+            if self.ret_ty is not None:
+                result += str(self.ret_ty) + ' '
+            result += "("
+            if self.name is not None:
+                result += str(self.name)
+            return result
+        else:
+            return str(self)
+
+    def right(self):
+        if self.kind == 'func':
+            result = ")"
+            if self.arg_tys == (Node('builtin', 'void'),):
+                result += '()'
+            else:
+                result += '(' + ', '.join(map(str, self.arg_tys)) + ')'
+            return result
+        else:
+            return ""
+
     def map(self, f):
         if self.kind == 'func':
             return self._replace(name=f(self.name) if self.name else None,
@@ -251,6 +302,20 @@ class ArrayNode(namedtuple('ArrayNode', 'kind dimension ty')):
             return result
         else:
             return repr(self)
+
+    def left(self):
+        if self.kind == 'array':
+            result = str(self.ty) + "("
+            return result
+        else:
+            return str(self)
+
+    def right(self):
+        if self.kind == 'array':
+            result = ")[" + str(self.dimension) + "]"
+            return result
+        else:
+            return ""
 
     def map(self, f):
         if self.kind == 'array':

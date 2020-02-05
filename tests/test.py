@@ -151,3 +151,4 @@ class TestDemangler(unittest.TestCase):
         self.assertDemangles('_Z1fPFvvE', 'f(void (*)())')
         self.assertDemangles('_Z1fPPFvvE', 'f(void (**)())')
         self.assertDemangles('_Z1fRPFvvE', 'f(void (*&)())')
+        self.assertDemangles('_Z1fKFvvE', 'f(void () const)')

@@ -325,6 +325,40 @@ class ArrayNode(namedtuple('ArrayNode', 'kind dimension ty')):
             return self
 
 
+class MemberNode(namedtuple('MemberNode', 'kind cls_ty member_ty')):
+    def __repr__(self):
+        return "<MemberNode {} {} {}>".format(self.kind, repr(self.cls_ty), repr(self.member_ty))
+
+    def __str__(self):
+        if self.kind == 'data':
+            result = str(self.member_ty) + " " + str(self.cls_ty) + "::*"
+            return result
+        elif self.kind == 'method':
+            result = self.member_ty.left() + str(self.cls_ty) + "::*" + self.member_ty.right()
+            return result
+        else:
+            return repr(self)
+
+    def left(self):
+        if self.kind == 'method':
+            return self.member_ty.left() + str(self.cls_ty) + "::*"
+        else:
+            return str(self)
+
+    def right(self):
+        if self.kind == 'method':
+            return self.member_ty.right()
+        else:
+            return ""
+
+    def map(self, f):
+        if self.kind in ('data', 'func'):
+            return self._replace(cls_ty=f(self.cls_ty) if self.cls_ty else None,
+                                 member_ty=f(self.member_ty) if self.member_ty else None)
+        else:
+            return self
+
+
 _ctor_dtor_map = {
     'C1': 'complete',
     'C2': 'base',
@@ -608,7 +642,8 @@ _TYPE_RE = re.compile(r"""
 (?P<template_arg_pack>  J) |
 (?P<arg_pack_expansion> Dp) |
 (?P<decltype>           D[tT]) |
-(?P<array_type>         A)
+(?P<array_type>         A) |
+(?P<member_type>        M)
 """, re.X)
 
 def _parse_type(cursor):
@@ -663,6 +698,14 @@ def _parse_type(cursor):
             return None
         type = _parse_type(cursor)
         node = ArrayNode('array', dimension, type)
+    elif match.group('member_type') is not None:
+        cls_ty = _parse_type(cursor)
+        member_ty = _parse_type(cursor)
+        if member_ty.kind == 'func':
+            kind = "method"
+        else:
+            kind = "data"
+        node = MemberNode(kind, cls_ty, member_ty)
     else:
         return None
     return node

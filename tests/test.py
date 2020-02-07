@@ -152,3 +152,16 @@ class TestDemangler(unittest.TestCase):
         self.assertDemangles('_Z1fPPFvvE', 'f(void (**)())')
         self.assertDemangles('_Z1fRPFvvE', 'f(void (*&)())')
         self.assertDemangles('_Z1fKFvvE', 'f(void () const)')
+
+    def test_member_data(self):
+        self.assertDemangles('_Z1fM3fooi', 'f(int foo::*)')
+        self.assertDemangles('_Z1fMN3foo3barEi', 'f(int foo::bar::*)')
+        self.assertDemangles('_Z1fM3fooN3bar1XE', 'f(bar::X foo::*)')
+        self.assertDemangles('_Z1fM3fooIcE3bar', 'f(bar foo<char>::*)')
+        self.assertDemangles('_Z1fM3foo3barIlE', 'f(bar<long> foo::*)')
+        self.assertDemangles('_Z3fooPM2ABi', 'foo(int AB::**)')
+
+    def test_member_function(self):
+        self.assertDemangles('_Z1fM3fooFvvE', 'f(void (foo::*)())')
+        self.assertDemangles('_Z1fMN3foo3barEFvvE', 'f(void (foo::bar::*)())')
+        self.assertDemangles('_Z3fooRM3barFviE', 'foo(void (bar::*&)(int))')

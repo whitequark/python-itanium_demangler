@@ -752,7 +752,7 @@ def _parse_encoding(cursor):
     if cursor.at_end():
         return name
 
-    if name.kind == 'qual_name' and name.value[-1].kind == 'tpl_args':
+    if name.kind == 'qual_name' and name.value[-1].kind == 'tpl_args' and name.value[-2].kind not in ('ctor', 'dtor'):
         ret_ty = _parse_type(cursor)
         if ret_ty is None:
             return None

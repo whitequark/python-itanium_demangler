@@ -25,6 +25,7 @@ class TestDemangler(unittest.TestCase):
         self.assertDemangles('_ZN3fooD0E', 'foo::{deleting dtor}')
         self.assertDemangles('_ZN3fooD1E', 'foo::{dtor}')
         self.assertDemangles('_ZN3fooD2E', 'foo::{base dtor}')
+        self.assertDemangles('_ZN3fooC1IcEEc', 'foo::{ctor}<char>(char)')
 
     def test_operator(self):
         for op in _operators:

@@ -535,7 +535,10 @@ _NAME_RE = re.compile(r"""
 (?P<nested_name>        N (?P<cv_qual> [rVK]*) (?P<ref_qual> [RO]?)) |
 (?P<template_param>     T) |
 (?P<template_args>      I) |
-(?P<constant>           L)
+(?P<constant>           L) |
+(?P<local_name>         Z) |
+(?P<unnamed_type>       Ut) |
+(?P<closure_type>       Ul)
 """, re.X)
 
 def _parse_name(cursor, is_nested=False):
@@ -603,6 +606,12 @@ def _parse_name(cursor, is_nested=False):
     elif match.group('constant') is not None:
         # not in the ABI doc, but probably means `const`
         return _parse_name(cursor, is_nested)
+    elif match.group('local_name') is not None:
+        raise NotImplementedError("local names are not supported")
+    elif match.group('unnamed_type') is not None:
+        raise NotImplementedError("unnamed types are not supported")
+    elif match.group('closure_type') is not None:
+        raise NotImplementedError("closure (lambda) types are not supported")
     if node is None:
         return None
 

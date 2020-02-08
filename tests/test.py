@@ -144,6 +144,7 @@ class TestDemangler(unittest.TestCase):
     def test_array(self):
         self.assertDemangles('_Z1fA1_c', 'f(char[(int)1])')
         self.assertDemangles('_Z1fRA1_c', 'f(char(&)[(int)1])')
+        self.assertDemangles('_Z1fIA1_cS0_E', 'f<char[(int)1], char[(int)1]>')
         self.assertParses('_Z1fA1c', None)
 
     def test_function(self):

@@ -698,6 +698,7 @@ def _parse_type(cursor):
             return None
         type = _parse_type(cursor)
         node = ArrayNode('array', dimension, type)
+        cursor.add_subst(node)
     elif match.group('member_type') is not None:
         cls_ty = _parse_type(cursor)
         member_ty = _parse_type(cursor)

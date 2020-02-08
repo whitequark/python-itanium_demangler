@@ -25,6 +25,8 @@ class TestDemangler(unittest.TestCase):
         self.assertDemangles('_ZN3fooD0E', 'foo::{deleting dtor}')
         self.assertDemangles('_ZN3fooD1E', 'foo::{dtor}')
         self.assertDemangles('_ZN3fooD2E', 'foo::{base dtor}')
+        self.assertDemangles('_ZN3fooC1IcEEc', 'foo::{ctor}<char>(char)')
+        self.assertDemangles('_ZN3fooD1IcEEc', 'foo::{dtor}<char>(char)')
 
     def test_operator(self):
         for op in _operators:
@@ -140,6 +142,9 @@ class TestDemangler(unittest.TestCase):
         self.assertDemangles('_ZmiIiE', 'operator-<int>')
         self.assertDemangles('_ZmiIiEvv', 'void operator-<int>()')
         self.assertDemangles('_ZmiIiEvKT_RT_', 'void operator-<int>(int const, int&)')
+        self.assertDemangles('_ZcviIiE', 'operator int<int>')
+        self.assertDemangles('_ZcviIiEv', 'operator int<int>()')
+        self.assertDemangles('_ZcviIiET_T_', 'operator int<int>(int, int)')
 
     def test_array(self):
         self.assertDemangles('_Z1fA1_c', 'f(char[(int)1])')

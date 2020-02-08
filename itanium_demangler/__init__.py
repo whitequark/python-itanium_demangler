@@ -613,11 +613,11 @@ def _parse_name(cursor, is_nested=False):
         node = QualNode('abi', node, frozenset(abi_tags))
 
     if not is_nested and cursor.accept('I') and (
-            node.kind == 'name' or node.kind == 'oper' or
+            node.kind in ('name', 'oper', 'oper_cast') or
             match.group('std_prefix') is not None or
             match.group('std_name') is not None or
             match.group('substitution') is not None):
-        if node.kind == 'name' or node.kind == 'oper' or match.group('std_prefix') is not None:
+        if node.kind in ('name', 'oper', 'oper_cast') or match.group('std_prefix') is not None:
             cursor.add_subst(node) # <unscoped-template-name> ::= <substitution>
         templ_args = _parse_until_end(cursor, 'tpl_args', _parse_type)
         if templ_args is None:
@@ -625,7 +625,7 @@ def _parse_name(cursor, is_nested=False):
         node = Node('qual_name', (node, templ_args))
         if ((match.group('std_prefix') is not None or
                 match.group('std_name') is not None) and
-                node.value[0].value[1].kind != 'oper'):
+                node.value[0].value[1].kind not in ('oper', 'oper_cast')):
             cursor.add_subst(node)
 
     return node

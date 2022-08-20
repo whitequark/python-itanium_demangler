@@ -3,7 +3,7 @@ import setuptools
 
 setuptools.setup(
     name="itanium_demangler",
-    version="1.0",
+    version="1.1",
     author="whitequark",
     author_email="whitequark@whitequark.org",
     description="Pure Python parser for mangled itanium symbols",
